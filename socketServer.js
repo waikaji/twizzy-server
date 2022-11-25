@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
   })
   
   socket.on("host-to-leaderboard", () => {
-    socket.to(game.pin).emit("player-to-leaderboard", game._id)
+    socket.to(game.pin).emit("player-to-leaderboard", leaderboard._id)
   })
 
   socket.on("question-preview", (cb) => {

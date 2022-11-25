@@ -22,8 +22,12 @@ const login = async (req, res) => {
         process.env.REFRESH_TOKEN_SECRET,
         // { expiresIn: "2h" }
       );
+      const result = {
+        userName: user.userName,
+        id: user._id,
+      }
       res.json({
-        result: user,
+        result,
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
@@ -78,9 +82,12 @@ const register = async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET,
       // { expiresIn: "2h" }
     );
-
+    const result = {
+      userName: user.userName,
+      id: user._id,
+    }
     res.status(201).json({
-      result: newUser,
+      result,
       accessToken: accessToken,
       refreshToken: refreshToken,
     });

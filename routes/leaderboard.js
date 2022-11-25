@@ -7,6 +7,7 @@ const {
   addPlayerResult,
   updateQuestionLeaderboard,
   updateCurrentLeaderboard,
+  getWinnerLeaderboard,
 } = require("../controllers/leaderboard");
 
 router.route("/").post(createLeaderboard);
@@ -22,5 +23,7 @@ router
   .patch(updateCurrentLeaderboard)
 
 router.route("/:id").get(getLeaderboard)
+
+router.route("/winnerLeaderboard/:id").get(getWinnerLeaderboard)
 
 module.exports = router;

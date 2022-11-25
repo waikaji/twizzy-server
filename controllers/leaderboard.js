@@ -46,6 +46,37 @@ const getLeaderboard = async (req, res) => {
   }
 }
 
+const getWinnerLeaderboard = async (req, res) => {
+  let leaderboard
+  try {
+    leaderboard = await Leaderboard.findById(req.params.id);
+    if (leaderboard == null) {
+      return res.status(404).json({ message: "Leaderboard not found" })
+    }
+    let n = leaderboard.currentLeaderboard.length;
+    let currentLeaderboard = leaderboard.currentLeaderboard[n - 1];
+    let nLeaderboard = currentLeaderboard.leaderboardList.length;
+    for(let i = 0; i < nLeaderboard; i++) {
+      for(let j = 0; j < (nLeaderboard - i - 1); j++) {
+        if(currentLeaderboard.leaderboardList[j].playerCurrentScore < currentLeaderboard.leaderboardList[j+1].playerCurrentScore) {
+          let temp = currentLeaderboard.leaderboardList[j];
+          currentLeaderboard.leaderboardList[j] = currentLeaderboard.leaderboardList[j + 1];
+          currentLeaderboard.leaderboardList[j + 1] = temp;
+        }
+      }
+    }
+
+    const winnerLeaderboard = {
+      gameId: leaderboard.gameId,
+      currentLeaderboard: currentLeaderboard
+    }
+
+    res.json(winnerLeaderboard)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 const addPlayerResult = async (req, res) => {
   const { leaderboardId } = req.params
   const { playerResultId } = req.body
@@ -69,12 +100,10 @@ const updateQuestionLeaderboard = async (req, res) => {
   try {
     leaderboard = await Leaderboard.findById(leaderboardId)
     console.log(leaderboard)
-    console.log("===========")
     leaderboard.questionLeaderboard[questionIndex - 1].questionResultList.push({
       playerId,
       playerPoints,
     })
-    console.log(leaderboard)
 
     const newLeaderboard = await leaderboard.save()
     res.status(201).json(newLeaderboard)
@@ -105,6 +134,7 @@ const updateCurrentLeaderboard = async (req, res) => {
 module.exports = {
   createLeaderboard,
   getLeaderboard,
+  getWinnerLeaderboard,
   addPlayerResult,
   updateQuestionLeaderboard,
   updateCurrentLeaderboard,
