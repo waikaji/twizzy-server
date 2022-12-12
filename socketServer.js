@@ -16,8 +16,10 @@ const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: [clientServer, "https://admin.socket.io/#/sockets"],
+    methods: ["GET", "POST"],
   },
 })
+
 
 app.use(cors({domains: allowedSocketDomains, credentials:true}));
 app.use(helmet());
@@ -89,7 +91,6 @@ io.on("connection", (socket) => {
   })
 
   socket.on("start-question-timer", (time, question, cb) => {
-    // console.log(question)
     console.log("Send question " + question.questionIndex + " data to players")
     socket.to(game.pin).emit("host-start-question-timer", time, question)
     cb()
@@ -102,4 +103,4 @@ io.on("connection", (socket) => {
 })
 
 instrument(io, { auth: false })
-server.listen(process.env.SOCKET_PORT, () => console.log(`Socket server has started`));
+server.listen(process.env.SOCKET_PORT, () => console.log(`Socket server has started ${process.env.SOCKET_PORT}`));

@@ -8,14 +8,14 @@ const jwt = require("jsonwebtoken");
 const login = async (req, res) => {
   const user = await User.findOne({ userName: req.body.userName });
   if (user == null) {
-    return res.status(400).send("Cannot find user");
+    return res.status(400).send({message: "Your username and password do not match"});
   }
 
   try {
     if (await bcrypt.compare(req.body.password, user.password)) {
       const accessToken = generateAccessToken({
         userName: user.userName,
-        id: user._id,
+        _id: user._id,
       });
       const refreshToken = jwt.sign(
         { userName: user.userName, id: user._id },
@@ -24,7 +24,7 @@ const login = async (req, res) => {
       );
       const result = {
         userName: user.userName,
-        id: user._id,
+        _id: user._id,
       }
       res.json({
         result,
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         refreshToken: refreshToken,
       });
     } else {
-      res.send("Not allowed");
+      res.status(400).send({message: "Your username and password do not match"});
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,12 +52,20 @@ const register = async (req, res) => {
   const existingEmail = await User.findOne({ email });
   const existingUserName = await User.findOne({ userName });
 
-  if (existingEmail || existingUserName) {
-    return res.status(400).json({ message: "User already exists." });
+  if (existingEmail) {
+    return res.status(400).json({ message: {email: "Email already exists." }});
+  }
+
+   if (existingUserName) {
+    return res.status(400).json({ message: {username: "Username already exists." }});
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ message: { password: "Password must be longer than 7 characters" }});
   }
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords don't match." }) ;
+    return res.status(400).json({ message: { password: "Passwords don't match." }});
   }
 
   const salt = await bcrypt.genSalt();
@@ -74,7 +82,7 @@ const register = async (req, res) => {
     const newUser = await user.save();
     const accessToken = generateAccessToken({
       userName: user.userName,
-      id: user._id,
+      _id: user._id,
     });
 
     const refreshToken = jwt.sign(
@@ -84,7 +92,7 @@ const register = async (req, res) => {
     );
     const result = {
       userName: user.userName,
-      id: user._id,
+      _id: user._id,
     }
     res.status(201).json({
       result,
