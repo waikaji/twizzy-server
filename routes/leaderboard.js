@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const router = express();
 
 const {
   createLeaderboard,
@@ -10,20 +10,21 @@ const {
   getWinnerLeaderboard,
 } = require("../controllers/leaderboard");
 
-router.route("/").post(createLeaderboard);
+const {
+  authenticateToken,
+  regenerateAccessToken,
+} = require("../middleware/auth");
 
-router.route("/:leaderboardId/playerresult").patch(addPlayerResult);
+router.post("/", createLeaderboard);
 
-router
-  .route("/:leaderboardId/questionleaderboard")
-  .patch(updateQuestionLeaderboard)
+router.patch("/:leaderboardId/playerresult", authenticateToken, addPlayerResult);
 
-router
-  .route("/:leaderboardId/currentleaderboard")
-  .patch(updateCurrentLeaderboard)
+router.patch("/:leaderboardId/questionleaderboard", authenticateToken, updateQuestionLeaderboard)
 
-router.route("/:id").get(getLeaderboard)
+router.patch("/:leaderboardId/currentleaderboard", authenticateToken, updateCurrentLeaderboard)
 
-router.route("/winnerLeaderboard/:id").get(getWinnerLeaderboard)
+router.get("/:id", authenticateToken, getLeaderboard)
+
+router.get("/winnerLeaderboard/:id", authenticateToken, getWinnerLeaderboard)
 
 module.exports = router;

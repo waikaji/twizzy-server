@@ -12,18 +12,12 @@ const { allowedDomains } = config;
 
 const app = express();
 
-const {
-  authenticateToken,
-  regenerateAccessToken,
-} = require("./middleware/auth");
-
 const quizRouter = require("./routes/quiz");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const gameRouter = require("./routes/game");
 const playerResultRouter = require("./routes/playerResult");
 const leaderboardRouter = require("./routes/leaderboard");
-
 
 mongoose.connect(process.env.DATABASE_URL);
 
@@ -35,9 +29,10 @@ app.use(express.json({limit: '5mb'}));
 app.use(cors({domains: allowedDomains, credentials:true}));
 app.use(helmet());
 app.use(compression());
-app.use(authenticateToken);
+// app.use(authenticateToken);
 // app.use(regenerateAccessToken);
 
+app.use("/api/auth", authRouter);
 app.use("/api/quizes", quizRouter);
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);

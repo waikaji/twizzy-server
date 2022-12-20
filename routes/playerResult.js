@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const router = express();
 
 const {
   createPlayerResult,
@@ -14,26 +14,23 @@ const {
   deleteAnswer,
 } = require("../controllers/playerResult");
 
-router
-  .route("/")
-  .get(getPlayerResults)
-  .post(createPlayerResult)
+const {
+  authenticateToken,
+  regenerateAccessToken,
+} = require("../middleware/auth");
 
-router
-  .route("/:id")
-  .get(getPlayerResult)
-  .patch(updatePlayerResult)
-  .delete(deletePlayerResult)
+router.get("/", authenticateToken, getPlayerResults)
+router.post("/", authenticateToken, createPlayerResult)
 
-router
-  .route("/:playerResultId/answers")
-  .patch(addAnswer)
-  .get(getAnswers)
+router.get("/:id", authenticateToken, getPlayerResult)
+router.patch("/:id", authenticateToken, updatePlayerResult)
+router.delete("/:id", authenticateToken, deletePlayerResult)
 
-router
-  .route("/:playerResultId/answers/:answerId")
-  .get(getAnswer)
-  .patch(updateAnswer)
-  .delete(deleteAnswer)
+router.patch("/:playerResultId/answers", authenticateToken, addAnswer)
+router.get("/:playerResultId/answers", authenticateToken, getAnswers)
 
-  module.exports = router;
+router.get("/:playerResultId/answers/:answerId", authenticateToken, getAnswer)
+router.patch("/:playerResultId/answers/:answerId", authenticateToken, updateAnswer)
+router.delete("/:playerResultId/answers/:answerId", authenticateToken, deleteAnswer)
+
+module.exports = router;
