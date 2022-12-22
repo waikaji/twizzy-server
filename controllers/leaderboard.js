@@ -99,7 +99,7 @@ const updateQuestionLeaderboard = async (req, res) => {
 
   try {
     leaderboard = await Leaderboard.findById(leaderboardId)
-    console.log(leaderboard)
+    // console.log(leaderboard)
     leaderboard.questionLeaderboard[questionIndex - 1].questionResultList.push({
       playerId,
       playerPoints,
