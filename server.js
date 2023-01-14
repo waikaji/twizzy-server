@@ -19,7 +19,7 @@ const gameRouter = require("./routes/game");
 const playerResultRouter = require("./routes/playerResult");
 const leaderboardRouter = require("./routes/leaderboard");
 
-mongoose.connect(process.env.DATABASE_URL);
+mongoose.connect(process.env.DATABASE_URL, { maxPoolSize: 10 });
 
 const db = mongoose.connection;
 db.on("error", (error) => console.log(error));

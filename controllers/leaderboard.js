@@ -106,6 +106,7 @@ const updateQuestionLeaderboard = async (req, res) => {
     })
 
     const newLeaderboard = await leaderboard.save()
+    
     res.status(201).json(newLeaderboard)
   } catch (error) {
     res.status(400).json({ message: error.message })
@@ -125,7 +126,19 @@ const updateCurrentLeaderboard = async (req, res) => {
     })
 
     const newLeaderboard = await leaderboard.save()
-    res.status(201).json(newLeaderboard)
+
+    let currentLeaderboard = newLeaderboard.currentLeaderboard[questionIndex - 1];
+    let nLeaderboard = currentLeaderboard.leaderboardList.length;
+    for(let i = 0; i < nLeaderboard; i++) {
+      for(let j = 0; j < (nLeaderboard - i - 1); j++) {
+        if(currentLeaderboard.leaderboardList[j].playerCurrentScore < currentLeaderboard.leaderboardList[j+1].playerCurrentScore) {
+          let temp = currentLeaderboard.leaderboardList[j];
+          currentLeaderboard.leaderboardList[j] = currentLeaderboard.leaderboardList[j + 1];
+          currentLeaderboard.leaderboardList[j + 1] = temp;
+        }
+      }
+    }
+    res.status(201).json({newLeaderboard, currentLeaderboard})
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
